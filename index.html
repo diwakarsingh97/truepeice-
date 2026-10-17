@@ -1,0 +1,535 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#090a12">
+<title>TRUEPRICE — Purchase Intelligence</title>
+<style>
+:root{
+--bg:#090a12;--surface:#101321;--surface2:#171b2d;--surface3:#20243a;
+--text:#f4f4ff;--muted:#989eb7;--line:#292e45;--accent:#a897ff;
+--accent2:#7962ff;--green:#71e5b6;--red:#ff8199;--amber:#ffd28a;
+--radius:20px;--shadow:0 18px 55px #0003;
+}
+body.light{
+--bg:#f4f5fb;--surface:#fff;--surface2:#f0f1fa;--surface3:#e7e8f5;
+--text:#191a2c;--muted:#73778e;--line:#e2e3ef;--accent:#735de3;
+--accent2:#5944c7;--green:#16865e;--red:#c83e5a;--amber:#986019;
+--shadow:0 15px 40px #29294b0b;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:14px/1.5 Inter,system-ui,-apple-system,"Segoe UI",sans-serif;transition:.2s}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+button:disabled{opacity:.5;cursor:not-allowed}
+input,select,textarea{width:100%;min-width:0;background:var(--surface2);color:var(--text);border:1px solid var(--line);border-radius:11px;padding:12px}
+textarea{resize:vertical}
+option{background:var(--surface)}
+a{color:var(--accent)}
+button{color:inherit}
+.topbar{height:72px;position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between;gap:15px;padding:0 4%;background:var(--bg);border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:11px;font-weight:900;letter-spacing:2px;font-size:16px;white-space:nowrap}
+.logo{width:36px;height:36px;border-radius:12px;display:grid;place-items:center;background:linear-gradient(140deg,#e0d8ff,#8067ff);color:#171129;font-weight:1000;font-size:20px}
+.top-actions{display:flex;align-items:center;gap:8px}
+.top-actions select{width:auto;max-width:120px;padding:9px}
+.icon-btn,.secondary{background:var(--surface2);border:1px solid var(--line);padding:10px 13px;border-radius:11px}
+.layout{display:grid;grid-template-columns:236px minmax(0,1fr);max-width:1600px;margin:auto;min-height:calc(100vh - 72px)}
+.sidebar{border-right:1px solid var(--line);padding:23px 15px;display:flex;flex-direction:column;gap:3px}
+.nav-label{font-size:10px;font-weight:850;letter-spacing:2px;color:var(--muted);padding:15px 11px 7px}
+.nav{border:0;background:transparent;color:var(--muted);text-align:left;display:flex;align-items:center;gap:12px;padding:12px;border-radius:12px;margin:2px 0}
+.nav:hover,.nav.active{background:var(--surface2);color:var(--text)}
+.nav.active{box-shadow:inset 3px 0 var(--accent)}
+.nav-icon{width:22px;text-align:center;font-size:17px}
+.side-bottom{margin-top:auto;padding:17px;border:1px solid var(--line);background:var(--surface);border-radius:16px}
+.main{padding:32px clamp(16px,3vw,46px) 45px;min-width:0}
+.mobile-menu{display:none}
+.eyebrow{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--accent);font-weight:850}
+h1{font-size:clamp(29px,4vw,44px);line-height:1.1;letter-spacing:-1.3px;margin:10px 0}
+h2{font-size:18px;letter-spacing:-.4px;margin:0}
+h3{font-size:14px;margin:0 0 8px}
+p{color:var(--muted);line-height:1.7;margin:7px 0}
+.small{font-size:11px;color:var(--muted)}
+.page-head{display:flex;justify-content:space-between;align-items:flex-start;gap:18px;margin-bottom:24px}
+.page-head p{max-width:650px}
+.grid{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:16px}
+.span-12{grid-column:span 12}.span-8{grid-column:span 8}.span-7{grid-column:span 7}.span-6{grid-column:span 6}.span-5{grid-column:span 5}.span-4{grid-column:span 4}.span-3{grid-column:span 3}
+.card{min-width:0;padding:21px;border:1px solid var(--line);border-radius:var(--radius);background:var(--surface);box-shadow:var(--shadow)}
+.hero{position:relative;overflow:hidden;background:radial-gradient(ellipse at 90% 0%,#7962ff30,transparent 45%),var(--surface);padding:clamp(22px,4vw,40px)}
+.hero h1{font-size:clamp(34px,5vw,56px);max-width:730px}
+.hero p{max-width:600px}
+.hero-glow{position:absolute;right:5%;top:20%;width:150px;height:150px;border-radius:50%;border:1px solid #a897ff35;box-shadow:0 0 70px #7962ff16;pointer-events:none}
+.btn{background:var(--accent);color:#161128;border:0;border-radius:11px;padding:12px 16px;font-weight:850}
+.btn:hover{filter:brightness(1.08)}
+.btn.secondary{background:var(--surface2);color:var(--text);border:1px solid var(--line)}
+.btn.danger{background:#ff81991a;color:var(--red);border:1px solid #ff819940}
+.btn.small-btn{padding:8px 10px;font-size:11px}
+.actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:16px}
+.pill{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:50px;padding:6px 10px;font-size:10px;color:var(--muted)}
+.good{color:var(--green)!important}.bad{color:var(--red)!important}.warm{color:var(--amber)!important}
+.metric{font-size:clamp(25px,3vw,34px);font-weight:850;letter-spacing:-1px;overflow-wrap:anywhere;margin:9px 0 3px}
+.metric-label{font-size:11px;color:var(--muted)}
+.card-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:15px}
+.card-head .symbol{height:35px;width:35px;display:grid;place-items:center;border-radius:11px;background:var(--surface2);font-size:17px}
+.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}
+.field{display:flex;flex-direction:column;gap:7px;min-width:0}
+.field label{font-size:11px;color:var(--muted);font-weight:700}
+.full{grid-column:1/-1}
+.product-card{border:1px solid var(--line);border-radius:15px;background:var(--surface2);padding:15px;min-width:0}
+.product-card input,.product-card select{margin:5px 0}
+.result{border:1px solid var(--line);background:var(--surface2);border-radius:15px;padding:16px;margin-top:16px}
+.list{display:flex;flex-direction:column}
+.list-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 0;border-bottom:1px solid var(--line)}
+.list-row:last-child{border-bottom:0}
+.list-row strong{font-size:12px}
+.list-row p{margin:4px 0;font-size:11px}
+.empty{border:1px dashed var(--line);border-radius:14px;text-align:center;padding:26px;color:var(--muted);font-size:12px}
+.progress{height:7px;background:var(--surface3);border-radius:20px;overflow:hidden;margin:12px 0}
+.progress span{height:100%;display:block;background:linear-gradient(90deg,var(--accent2),var(--accent));border-radius:20px}
+.statline{display:flex;justify-content:space-between;gap:12px;font-size:12px;margin:10px 0}
+hr{border:0;border-top:1px solid var(--line);margin:19px 0}
+.table-wrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:12px}
+th,td{padding:12px 9px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{color:var(--muted);font-weight:700}
+.score-ring{width:88px;height:88px;border:5px solid var(--accent);border-radius:50%;display:grid;place-items:center;font-size:23px;font-weight:900;flex-shrink:0}
+.activity-dot{width:8px;height:8px;background:var(--accent);border-radius:50%;display:inline-block;margin-right:7px}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--text);color:var(--bg);border-radius:12px;padding:12px 18px;z-index:50;box-shadow:var(--shadow);max-width:90vw}
+.hidden{display:none!important}
+footer{padding:30px 0 0;text-align:center;font-size:10px;color:var(--muted)}
+@media(max-width:1000px){
+.layout{grid-template-columns:1fr}
+.sidebar{position:fixed;top:72px;bottom:0;left:0;width:265px;background:var(--bg);z-index:30;overflow:auto;transform:translateX(-110%);transition:transform .22s;box-shadow:var(--shadow)}
+.sidebar.open{transform:translateX(0)}
+.mobile-menu{display:inline-block}
+.span-8,.span-7,.span-5,.span-4,.span-3{grid-column:span 6}
+}
+@media(max-width:620px){
+.topbar{height:65px;padding:0 12px;gap:7px}
+.brand{font-size:13px;letter-spacing:1px;gap:7px}
+.logo{width:31px;height:31px}
+.top-actions{gap:5px}
+.top-actions select{max-width:82px;padding:8px 3px;font-size:10px}
+.icon-btn{padding:8px}
+.sidebar{top:65px}
+.main{padding:22px 12px 35px}
+.card{padding:16px;border-radius:16px}
+.span-8,.span-7,.span-6,.span-5,.span-4,.span-3{grid-column:span 12}
+.form-grid{grid-template-columns:1fr}
+.full{grid-column:auto}
+.hero h1{font-size:36px}
+.page-head{flex-direction:column;gap:8px}
+.metric{font-size:28px}
+}
+</style>
+</head>
+<body>
+<header class="topbar">
+ <div style="display:flex;align-items:center;gap:10px">
+  <button class="icon-btn mobile-menu" onclick="toggleMenu()" aria-label="Menu">☰</button>
+  <div class="brand"><div class="logo">T</div>TRUEPRICE</div>
+ </div>
+ <div class="top-actions">
+  <select id="currency" onchange="setCurrency(this.value)" aria-label="Currency">
+   <option value="INR">INR ₹</option><option value="USD">USD $</option>
+   <option value="EUR">EUR €</option><option value="GBP">GBP £</option>
+   <option value="JPY">JPY ¥</option><option value="AED">AED</option>
+   <option value="CAD">CAD</option><option value="AUD">AUD</option>
+  </select>
+  <button class="icon-btn" onclick="toggleTheme()" aria-label="Change theme">◐</button>
+ </div>
+</header>
+<div class="layout">
+<aside class="sidebar" id="sidebar">
+ <div class="nav-label">INTELLIGENCE</div>
+ <button class="nav active" data-page="home" onclick="go('home')"><span class="nav-icon">⌂</span>Overview</button>
+ <button class="nav" data-page="lab" onclick="go('lab')"><span class="nav-icon">⌘</span>Product Lab</button>
+ <button class="nav" data-page="cost" onclick="go('cost')"><span class="nav-icon">◈</span>True Cost Studio</button>
+ <button class="nav" data-page="deal" onclick="go('deal')"><span class="nav-icon">✳</span>Deal Analyzer</button>
+ <button class="nav" data-page="watch" onclick="go('watch')"><span class="nav-icon">◎</span>Price Watch</button>
+ <button class="nav" data-page="vault" onclick="go('vault')"><span class="nav-icon">▤</span>Decision Vault</button>
+ <div class="nav-label">PERSONAL SPACE</div>
+ <button class="nav" data-page="plus" onclick="go('plus')"><span class="nav-icon">✦</span>TRUEPRICE Plus</button>
+ <button class="nav" data-page="settings" onclick="go('settings')"><span class="nav-icon">⚙</span>Settings & Backup</button>
+ <div class="side-bottom">
+  <div class="eyebrow">THE TRUEPRICE STANDARD</div>
+  <h3 style="margin-top:10px">Think beyond the price tag.</h3>
+  <p class="small">Evaluate cost, quality, longevity and value before you buy.</p>
+ </div>
+</aside>
+<main class="main" id="main"></main>
+</div>
+<div id="toast" class="toast hidden" role="status"></div>
+<script>
+const STORAGE_KEY='trueprice_advanced_v2';
+const DEFAULTS={currency:'INR',theme:'dark',comparisons:[],watches:[],decisions:[],activity:[],page:'home'};
+let state;
+try{state={...DEFAULTS,...JSON.parse(localStorage.getItem(STORAGE_KEY)||'{}')}}catch(e){state={...DEFAULTS}}
+for(const k of ['comparisons','watches','decisions','activity'])if(!Array.isArray(state[k]))state[k]=[];
+if(!['INR','USD','EUR','GBP','JPY','AED','CAD','AUD'].includes(state.currency))state.currency='INR';
+let page='home',toastTimer;
+const PAGE_INFO={
+home:['YOUR BUYING INTELLIGENCE','Your decisions, elevated.','A personal command centre for smarter purchases and better value.'],
+lab:['MULTI-FACTOR ANALYSIS','Product Lab','Compare products by ownership cost, warranty, reliability and the features that matter to you.'],
+cost:['OWNERSHIP INTELLIGENCE','True Cost Studio','Model the full cost of owning something—not just what you pay today.'],
+deal:['OFFER INTELLIGENCE','Deal Analyzer','Assess discounts, extra fees, budget impact and whether an offer is worth considering.'],
+watch:['PRICE MONITORING','Price Watch','Track the prices you observe and keep your target prices organised.'],
+vault:['YOUR PERSONAL KNOWLEDGE BASE','Decision Vault','Preserve research, purchase plans, comparisons and the reasoning behind your choices.'],
+plus:['PREMIUM MEMBERSHIP','TRUEPRICE Plus','A premium experience designed for more informed buying decisions.'],
+settings:['YOUR WORKSPACE','Settings & Backup','Personalise your interface and manage your locally saved information.']
+};
+function save(){try{localStorage.setItem(STORAGE_KEY,JSON.stringify(state))}catch(e){notify('Storage is full. Export your backup and remove some saved entries.')}}
+function money(v){
+ const n=Number(v)||0;
+ try{return new Intl.NumberFormat('en',{style:'currency',currency:state.currency,maximumFractionDigits:state.currency==='JPY'?0:2}).format(n)}
+ catch(e){return state.currency+' '+n.toFixed(2)}
+}
+function safe(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function field(id,label,placeholder='',type='text',extra=''){
+ return `<div class="field"><label for="${id}">${label}</label><input id="${id}" type="${type}" placeholder="${placeholder}" ${extra}></div>`;
+}
+function get(id){return document.getElementById(id)}
+function text(id){return(get(id)?.value||'').trim()}
+function n(id){return Math.max(0,Number(get(id)?.value)||0)}
+function notify(msg){
+ const t=get('toast');t.textContent=msg;t.classList.remove('hidden');
+ clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.add('hidden'),3000);
+}
+function logActivity(label,detail=''){
+ state.activity.unshift({label,detail,time:Date.now()});state.activity=state.activity.slice(0,40);save();
+}
+function toggleTheme(){state.theme=state.theme==='dark'?'light':'dark';document.body.classList.toggle('light',state.theme==='light');save()}
+function setCurrency(v){state.currency=v;save();render()}
+function toggleMenu(){get('sidebar').classList.toggle('open')}
+function go(p){
+ page=p;get('sidebar').classList.remove('open');render();window.scrollTo({top:0,behavior:'smooth'});
+}
+function removeItem(key,id){
+ if(!confirm('Delete this saved item?'))return;
+ state[key]=state[key].filter(x=>String(x.id??x.time)!==String(id));save();render();notify('Item removed.');
+}
+function card(title,body,span='span-6',symbol='✦'){
+ return `<section class="card ${span}"><div class="card-head"><h2>${title}</h2><span class="symbol">${symbol}</span></div>${body}</section>`;
+}
+function empty(msg){return `<div class="empty">${msg}</div>`}
+function header(){
+ const x=PAGE_INFO[page];
+ return `<div class="page-head"><div><div class="eyebrow">${x[0]}</div><h1>${x[1]}</h1><p>${x[2]}</p></div>${page==='home'?'<span class="pill">● YOUR PERSONAL WORKSPACE</span>':''}</div>`;
+}
+function render(){
+ document.body.classList.toggle('light',state.theme==='light');
+ get('currency').value=state.currency;
+ document.querySelectorAll('.nav').forEach(x=>x.classList.toggle('active',x.dataset.page===page));
+ const pages={home:homePage,lab:labPage,cost:costPage,deal:dealPage,watch:watchPage,vault:vaultPage,plus:plusPage,settings:settingsPage};
+ get('main').innerHTML=header()+pages[page]()+`<footer>TRUEPRICE · Buy with clarity.<br><br>Calculations are estimates based on your inputs. Verify product specifications, pricing, retailer terms and warranties before purchasing.</footer>`;
+}
+function homePage(){
+ const reached=state.watches.filter(w=>w.target>0&&w.current<=w.target).length;
+ const tracked=state.watches.reduce((a,w)=>a+(w.history?.length||0),0);
+ const recent=state.activity.slice(0,5);
+ return `<div class="grid">
+ <section class="card span-12 hero">
+ <div class="hero-glow"></div><span class="pill">✦ PURCHASE INTELLIGENCE SYSTEM</span>
+ <h1>Buy with confidence.<br><span style="color:var(--accent)">Not guesswork.</span></h1>
+ <p>Turn product research into a considered decision. Compare lifetime costs, evaluate offers and keep your buying research in one refined workspace.</p>
+ <div class="actions"><button class="btn" onclick="go('lab')">Open Product Lab ↗</button><button class="btn secondary" onclick="go('cost')">Calculate ownership cost</button></div>
+ </section>
+ <section class="card span-3"><div class="eyebrow">RESEARCH</div><div class="metric">${state.comparisons.length}</div><div class="metric-label">Saved comparisons</div><hr><button class="btn secondary small-btn" onclick="go('lab')">Explore lab →</button></section>
+ <section class="card span-3"><div class="eyebrow">MONITORING</div><div class="metric">${state.watches.length}</div><div class="metric-label">Tracked products</div><hr><button class="btn secondary small-btn" onclick="go('watch')">View watchlist →</button></section>
+ <section class="card span-3"><div class="eyebrow">TARGETS</div><div class="metric">${reached}</div><div class="metric-label">At or below target</div><hr><button class="btn secondary small-btn" onclick="go('watch')">Review targets →</button></section>
+ <section class="card span-3"><div class="eyebrow">KNOWLEDGE</div><div class="metric">${state.decisions.length}</div><div class="metric-label">Saved decisions</div><hr><button class="btn secondary small-btn" onclick="go('vault')">Open vault →</button></section>
+ ${card('Your buying toolkit',`<div class="list">
+ <div class="list-row"><div><strong>01 · Product Lab</strong><p>Compare two products with weighted scoring.</p></div><button class="secondary" onclick="go('lab')">Open ↗</button></div>
+ <div class="list-row"><div><strong>02 · True Cost Studio</strong><p>Calculate the real cost over time.</p></div><button class="secondary" onclick="go('cost')">Open ↗</button></div>
+ <div class="list-row"><div><strong>03 · Deal Analyzer</strong><p>Review discounts and hidden costs.</p></div><button class="secondary" onclick="go('deal')">Open ↗</button></div>
+ </div>`,'span-7','⌘')}
+ ${card('Recent activity',recent.length?`<div class="list">${recent.map(a=>`<div class="list-row"><div><strong><span class="activity-dot"></span>${safe(a.label)}</strong><p>${safe(a.detail)} · ${new Date(a.time).toLocaleDateString()}</p></div></div>`).join('')}</div>`:empty('Your research activity will appear here as you use TRUEPRICE.'),'span-5','◷')}
+ <section class="card span-12"><div class="eyebrow">THE VALUE PRINCIPLE</div><h2 style="margin-top:9px">A low price is not always a good purchase.</h2><p>Reliability, warranty, running costs, repairability and whether you actually need the product can matter more than the discount. Use TRUEPRICE to structure your research; verify the facts with independent sources before you buy.</p></section>
+ </div>`;
+}
+function labPage(){
+ return `<div class="grid">
+ ${card('Build a comparison',`<p>Enter information for two products. Score each one from 1–10 on the factors that matter to you.</p>
+ <div class="form-grid" style="margin-top:16px">
+ <div class="product-card"><div class="eyebrow">PRODUCT A</div>
+ ${field('aName','Product name','e.g. Laptop A')}
+ ${field('aPrice','Purchase price','65000','number','min="0"')}
+ ${field('aRun','Annual running costs','2500','number','min="0"')}
+ ${field('aMaint','Annual maintenance','1500','number','min="0"')}
+ ${field('aWarranty','Warranty (years)','2','number','min="0" step=".5"')}
+ ${field('aReliability','Reliability score (1–10)','8','number','min="1" max="10"')}
+ ${field('aFeatures','Feature fit (1–10)','8','number','min="1" max="10"')}
+ ${field('aQuality','Build quality (1–10)','8','number','min="1" max="10"')}
+ </div>
+ <div class="product-card"><div class="eyebrow">PRODUCT B</div>
+ ${field('bName','Product name','e.g. Laptop B')}
+ ${field('bPrice','Purchase price','72000','number','min="0"')}
+ ${field('bRun','Annual running costs','1800','number','min="0"')}
+ ${field('bMaint','Annual maintenance','1000','number','min="0"')}
+ ${field('bWarranty','Warranty (years)','3','number','min="0" step=".5"')}
+ ${field('bReliability','Reliability score (1–10)','9','number','min="1" max="10"')}
+ ${field('bFeatures','Feature fit (1–10)','9','number','min="1" max="10"')}
+ ${field('bQuality','Build quality (1–10)','8','number','min="1" max="10"')}
+ </div>
+ <div class="field"><label>Ownership period</label><select id="labYears"><option value="1">1 year</option><option value="3" selected>3 years</option><option value="5">5 years</option><option value="10">10 years</option></select></div>
+ <div class="field"><label>Your top priority</label><select id="labPriority"><option value="balanced">Balanced value</option><option value="cost">Lowest ownership cost</option><option value="quality">Quality and reliability</option><option value="features">Feature fit</option></select></div>
+ <div class="field full"><label>Research notes</label><textarea id="labNotes" rows="2" placeholder="Model numbers, sources checked, things to verify..."></textarea></div>
+ </div><div class="actions"><button class="btn" onclick="compareLab()">Analyse products</button></div><div id="labResult"></div>`,'span-12','⌘')}
+ ${card('Saved comparisons',comparisonsHTML(),'span-12','▤')}
+ </div>`;
+}
+function readProduct(prefix){
+ return {name:text(prefix+'Name')||('Product '+prefix.toUpperCase()),price:n(prefix+'Price'),run:n(prefix+'Run'),maint:n(prefix+'Maint'),warranty:n(prefix+'Warranty'),reliability:Math.min(10,Math.max(1,Number(get(prefix+'Reliability').value)||5)),features:Math.min(10,Math.max(1,Number(get(prefix+'Features').value)||5)),quality:Math.min(10,Math.max(1,Number(get(prefix+'Quality').value)||5))};
+}
+function compareLab(){
+ const a=readProduct('a'),b=readProduct('b'),years=n('labYears')||3,priority=text('labPriority'),notes=text('labNotes');
+ if(!a.price||!b.price){notify('Enter a purchase price for both products.');return}
+ a.total=a.price+(a.run+a.maint)*years;
+ b.total=b.price+(b.run+b.maint)*years;
+ function score(p){
+  const cost=100*(Math.min(a.total,b.total)/Math.max(p.total,1));
+  const warranty=100*Math.min(p.warranty,5)/5;
+  const quality=(p.reliability+p.quality)/2*10,features=p.features*10;
+  if(priority==='cost')return Math.round(cost*.75+quality*.1+features*.05+warranty*.1);
+  if(priority==='quality')return Math.round(quality*.65+cost*.15+features*.1+warranty*.1);
+  if(priority==='features')return Math.round(features*.65+cost*.15+quality*.1+warranty*.1);
+  return Math.round(cost*.4+quality*.25+features*.2+warranty*.15);
+ }
+ a.score=score(a);b.score=score(b);
+ const winner=a.score===b.score?'Very close result':a.score>b.score?a.name:b.name;
+ const record={id:Date.now(),name:a.name+' vs '+b.name,a,b,years,priority,notes,winner,time:Date.now()};
+ state.comparisons.unshift(record);state.comparisons=state.comparisons.slice(0,100);save();
+ logActivity('Product comparison saved',record.name);
+ get('labResult').innerHTML=`<div class="result">
+ <div class="eyebrow">COMPARISON REPORT</div><h2 style="margin-top:8px">${safe(winner)}</h2>
+ <p>Weighted score based on your chosen priority and the information you entered.</p>
+ <div class="grid" style="margin-top:15px">
+ <div class="span-6"><div class="product-card"><div class="small">${safe(a.name)}</div><div class="metric">${a.score}<span class="small"> / 100</span></div><div class="progress"><span style="width:${a.score}%"></span></div><strong>${money(a.total)}</strong><div class="small">${years}-year estimated cost</div></div></div>
+ <div class="span-6"><div class="product-card"><div class="small">${safe(b.name)}</div><div class="metric">${b.score}<span class="small"> / 100</span></div><div class="progress"><span style="width:${b.score}%"></span></div><strong>${money(b.total)}</strong><div class="small">${years}-year estimated cost</div></div></div>
+ </div>
+ <div class="table-wrap" style="margin-top:15px"><table><thead><tr><th>Factor</th><th>${safe(a.name)}</th><th>${safe(b.name)}</th></tr></thead><tbody>
+ <tr><td>Purchase price</td><td>${money(a.price)}</td><td>${money(b.price)}</td></tr>
+ <tr><td>Running + maintenance / year</td><td>${money(a.run+a.maint)}</td><td>${money(b.run+b.maint)}</td></tr>
+ <tr><td>Warranty</td><td>${a.warranty} years</td><td>${b.warranty} years</td></tr>
+ <tr><td>Reliability</td><td>${a.reliability}/10</td><td>${b.reliability}/10</td></tr>
+ <tr><td>Feature fit</td><td>${a.features}/10</td><td>${b.features}/10</td></tr>
+ <tr><td>Build quality</td><td>${a.quality}/10</td><td>${b.quality}/10</td></tr>
+ <tr><td>Estimated total cost</td><td><strong>${money(a.total)}</strong></td><td><strong>${money(b.total)}</strong></td></tr>
+ </tbody></table></div>
+ <p class="small">Scores reflect your self-entered ratings, not independently verified product quality. Warranty length alone does not indicate warranty quality.</p>
+ <div class="actions"><button class="btn secondary" onclick="saveComparisonDecision(${record.id})">Save to Decision Vault</button></div>
+ </div>`;
+}
+function comparisonsHTML(){
+ if(!state.comparisons.length)return empty('No saved comparisons yet.');
+ return `<div class="list">${state.comparisons.slice(0,30).map(c=>`<div class="list-row"><div><strong>${safe(c.name)}</strong><p>${c.years} year${c.years===1?'':'s'} · ${new Date(c.time).toLocaleDateString()}</p><p>${safe(c.a.name)}: ${money(c.a.total)} · ${safe(c.b.name)}: ${money(c.b.total)}</p></div><button class="btn secondary small-btn" onclick="removeItem('comparisons',${c.id})">Delete</button></div>`).join('')}</div>`;
+}
+function saveComparisonDecision(id){
+ const c=state.comparisons.find(x=>x.id===id);if(!c)return;
+ state.decisions.unshift({id:Date.now(),title:c.name,summary:`${c.years}-year comparison. ${c.a.name}: ${money(c.a.total)}; ${c.b.name}: ${money(c.b.total)}. Scores: ${c.a.score}/100 and ${c.b.score}/100.`,notes:c.notes||'',time:Date.now()});
+ save();logActivity('Decision saved',c.name);notify('Saved to Decision Vault.');
+}
+function costPage(){
+ return `<div class="grid">
+ ${card('Ownership cost model',`<p>Estimate what a product may cost over its useful life. Enter resale value as your best estimate, not a guaranteed future amount.</p>
+ <div class="form-grid" style="margin-top:16px">
+ ${field('ctName','Product / asset','e.g. Electric scooter')}
+ ${field('ctPurchase','Purchase price','100000','number','min="0"')}
+ ${field('ctSetup','Setup, delivery and taxes','5000','number','min="0"')}
+ ${field('ctRun','Annual running costs','12000','number','min="0"')}
+ ${field('ctMaint','Annual maintenance','4000','number','min="0"')}
+ ${field('ctInsurance','Annual insurance / fees','3000','number','min="0"')}
+ ${field('ctRepair','Estimated total extra repairs','5000','number','min="0"')}
+ ${field('ctResale','Expected resale value at end','35000','number','min="0"')}
+ <div class="field"><label>Ownership period</label><select id="ctYears"><option value="1">1 year</option><option value="3">3 years</option><option value="5" selected>5 years</option><option value="10">10 years</option></select></div>
+ </div><div class="actions"><button class="btn" onclick="calculateOwnership()">Generate cost report</button></div><div id="ctResult"></div>`,'span-7','◈')}
+ ${card('How to read the report',`<div class="list">
+ <div class="list-row"><div><strong>Gross ownership cost</strong><p>Purchase, setup and recurring costs.</p></div></div>
+ <div class="list-row"><div><strong>Net ownership cost</strong><p>Gross cost minus estimated resale.</p></div></div>
+ <div class="list-row"><div><strong>Monthly equivalent</strong><p>Net cost divided across ownership months.</p></div></div>
+ <div class="list-row"><div><strong>Cost per year</strong><p>Net cost divided by ownership years.</p></div></div>
+ </div><hr><p>These estimates do not automatically account for inflation, investment returns, loan interest or unexpected events. Add relevant expenses to your inputs.</p>`,'span-5','ⓘ')}
+ </div>`;
+}
+function calculateOwnership(){
+ const name=text('ctName')||'My purchase',purchase=n('ctPurchase'),setup=n('ctSetup'),run=n('ctRun'),maint=n('ctMaint'),insurance=n('ctInsurance'),repair=n('ctRepair'),resale=n('ctResale'),years=n('ctYears')||5;
+ if(!purchase){notify('Enter a purchase price.');return}
+ const initial=purchase+setup,recurring=(run+maint+insurance)*years,gross=initial+recurring+repair,total=Math.max(0,gross-resale);
+ get('ctResult').innerHTML=`<div class="result"><div class="eyebrow">OWNERSHIP COST REPORT</div><h2 style="margin-top:10px">${safe(name)}</h2><div class="metric">${money(total)}</div><p>Estimated net cost over ${years} year${years===1?'':'s'}</p><div class="grid" style="margin-top:13px">
+ <div class="span-6"><div class="product-card"><div class="small">Monthly equivalent</div><div class="metric">${money(total/(years*12))}</div></div></div>
+ <div class="span-6"><div class="product-card"><div class="small">Cost per year</div><div class="metric">${money(total/years)}</div></div></div></div>
+ <hr><div class="list">
+ <div class="list-row"><span>Purchase + setup</span><strong>${money(initial)}</strong></div>
+ <div class="list-row"><span>Recurring costs</span><strong>${money(recurring)}</strong></div>
+ <div class="list-row"><span>Extra repairs</span><strong>${money(repair)}</strong></div>
+ <div class="list-row"><span>Gross cost</span><strong>${money(gross)}</strong></div>
+ <div class="list-row"><span>Less estimated resale</span><strong class="good">−${money(resale)}</strong></div>
+ <div class="list-row"><strong>Estimated net cost</strong><strong>${money(total)}</strong></div></div>
+ <div class="actions"><button class="btn secondary" onclick="saveCost(${JSON.stringify(name).replace(/</g,'\\u003c')},${total},${years})">Save report to Vault</button></div></div>`;
+}
+function saveCost(name,total,years){
+ state.decisions.unshift({id:Date.now(),title:name+' — ownership report',summary:`Estimated ${years}-year net ownership cost: ${money(total)}. Monthly equivalent: ${money(total/(years*12))}.`,notes:'Estimate based on user-provided figures.',time:Date.now()});
+ save();logActivity('Ownership report saved',name);notify('Report saved.');
+}
+function dealPage(){
+ return `<div class="grid">
+ ${card('Offer intelligence',`<p>Compare the final checkout price with a reference price. A discount is only meaningful if the reference price is credible and you actually want the product.</p>
+ <div class="form-grid" style="margin-top:16px">
+ ${field('dName','Product / offer','e.g. Wireless headphones')}
+ ${field('dReference','Reference price','5000','number','min="0"')}
+ ${field('dOffer','Advertised offer price','3999','number','min="0"')}
+ ${field('dFees','Delivery and extra fees','99','number','min="0"')}
+ ${field('dCoupons','Additional valid coupon savings','0','number','min="0"')}
+ ${field('dExtras','Estimated value of included extras','0','number','min="0"')}
+ ${field('dBudget','Your budget','4500','number','min="0"')}
+ <div class="field"><label>Do you need this item?</label><select id="dNeed"><option value="yes">Yes, I need it</option><option value="maybe">Not sure yet</option><option value="no">No, it is an impulse purchase</option></select></div>
+ <div class="field"><label>Reference price confidence</label><select id="dConfidence"><option value="high">High — checked multiple sources</option><option value="medium" selected>Medium — one reliable source</option><option value="low">Low — advertised list price only</option></select></div>
+ </div><div class="actions"><button class="btn" onclick="analyseDeal()">Analyse offer</button></div><div id="dResult"></div>`,'span-7','✳')}
+ ${card('Deal quality checklist',`<div class="list">
+ <div class="list-row"><div><strong>Price credibility</strong><p>Compare equivalent models at multiple retailers.</p></div></div>
+ <div class="list-row"><div><strong>Final checkout price</strong><p>Include delivery, taxes and mandatory extras.</p></div></div>
+ <div class="list-row"><div><strong>Product fit</strong><p>Don't let a discount create a purchase you don't need.</p></div></div>
+ <div class="list-row"><div><strong>Return and warranty terms</strong><p>Check conditions, exclusions and seller reputation.</p></div></div>
+ </div><hr><p class="small">TRUEPRICE does not independently verify discounts or retailer listings. All inputs are supplied by you.</p>`,'span-5','✓')}
+ </div>`;
+}
+function analyseDeal(){
+ const name=text('dName')||'Offer',ref=n('dReference'),offer=n('dOffer'),fees=n('dFees'),coupon=n('dCoupons'),extras=n('dExtras'),budget=n('dBudget'),need=text('dNeed'),confidence=text('dConfidence');
+ if(!ref||!offer){notify('Enter both a reference price and offer price.');return}
+ const final=Math.max(0,offer+fees-coupon),savings=ref-final,discount=savings/ref*100;
+ let score=50;
+ score+=Math.max(-20,Math.min(25,discount));
+ if(confidence==='high')score+=15;if(confidence==='low')score-=20;
+ if(need==='yes')score+=10;if(need==='no')score-=35;
+ if(budget>0&&final>budget)score-=20;
+ score=Math.max(0,Math.min(100,Math.round(score)));
+ let verdict=score>=75?'Promising on your inputs':score>=50?'Worth further checking':'Pause and reconsider';
+ const note=`Final estimated price ${money(final)}. Difference against reference ${money(savings)}. Confidence: ${confidence}. Need: ${need}.`;
+ get('dResult').innerHTML=`<div class="result"><div class="eyebrow">OFFER QUALITY INDICATOR</div><div style="display:flex;gap:18px;align-items:center;margin:14px 0"><div class="score-ring">${score}</div><div><h2>${verdict}</h2><p>Indicative score from your inputs—not a verified deal rating.</p></div></div><div class="progress"><span style="width:${score}%"></span></div>
+ <div class="list">
+ <div class="list-row"><span>Reference price</span><strong>${money(ref)}</strong></div>
+ <div class="list-row"><span>Offer + fees − coupon</span><strong>${money(final)}</strong></div>
+ <div class="list-row"><span>Difference from reference</span><strong class="${savings>=0?'good':'bad'}">${money(savings)}</strong></div>
+ <div class="list-row"><span>Reference-price discount</span><strong>${discount.toFixed(1)}%</strong></div>
+ <div class="list-row"><span>Budget status</span><strong class="${!budget||final<=budget?'good':'bad'}">${!budget?'No budget entered':final<=budget?'Within budget':'Over budget'}</strong></div>
+ <div class="list-row"><span>Included extras (your estimate)</span><strong>${money(extras)}</strong></div></div>
+ ${need==='no'?'<p class="bad">You indicated this is an impulse purchase. Consider not buying it.</p>':''}
+ ${confidence==='low'?'<p class="warm">Reference price confidence is low. Verify the normal selling price before treating this as a discount.</p>':''}
+ <p class="small">${safe(note)} Extras are shown separately and are not deducted from the checkout price.</p>
+ <div class="actions"><button class="btn secondary" onclick="saveDeal('${safe(name)}',${final},${score})">Save analysis</button></div></div>`;
+}
+function saveDeal(name,price,score){
+ state.decisions.unshift({id:Date.now(),title:name+' — deal analysis',summary:`Estimated final price ${money(price)}. Input-based offer indicator: ${score}/100.`,notes:'Verify the reference price and terms independently.',time:Date.now()});
+ save();logActivity('Offer analysis saved',name);notify('Offer analysis saved.');
+}
+function watchPage(){
+ return `<div class="grid">
+ ${card('Add a tracked product',`<p>Save the current price you observed and your target price. Price history grows as you manually update the listing.</p>
+ <div class="form-grid" style="margin-top:16px">
+ ${field('wName','Product name','e.g. Air purifier')}
+ ${field('wStore','Retailer / store','Store name')}
+ ${field('wCurrent','Observed price','8999','number','min="0"')}
+ ${field('wTarget','Target price','7500','number','min="0"')}
+ <div class="field full"><label>Product page URL (optional)</label><input id="wUrl" type="url" placeholder="https://example.com/product"></div>
+ <div class="field full"><label>Notes (optional)</label><textarea id="wNotes" rows="2" placeholder="Model, colour, seller, warranty..."></textarea></div>
+ </div><div class="actions"><button class="btn" onclick="addWatch()">Add to Price Watch</button></div>`,'span-12','◎')}
+ ${card('Your watchlist',watchlistHTML(),'span-12','↗')}
+ <section class="card span-12"><div class="eyebrow">HONEST TRACKING</div><h2 style="margin-top:9px">You control the price updates.</h2><p>TRUEPRICE currently does not fetch live retailer prices or send automatic notifications. When you check a product, use Update to save the new observed price and add a point to its history.</p></section>
+ </div>`;
+}
+function addWatch(){
+ const name=text('wName'),current=n('wCurrent'),target=n('wTarget'),store=text('wStore'),url=text('wUrl'),notes=text('wNotes');
+ if(!name||!current){notify('Enter a product name and current price.');return}
+ if(url){try{const u=new URL(url);if(!['http:','https:'].includes(u.protocol))throw 0}catch(e){notify('Enter a valid http or https product URL.');return}}
+ const id=Date.now();
+ state.watches.unshift({id,name,current,target,store,url,notes,created:id,updated:id,history:[{price:current,time:id}]});
+ save();logActivity('Product added to Price Watch',name);render();notify('Product added to your watchlist.');
+}
+function updateWatch(id){
+ const w=state.watches.find(x=>x.id===id);if(!w)return;
+ const raw=prompt('Enter the latest observed price for '+w.name,String(w.current));if(raw===null)return;
+ const price=Number(raw);if(!Number.isFinite(price)||price<=0){notify('Enter a valid price greater than zero.');return}
+ w.current=price;w.updated=Date.now();w.history=w.history||[];w.history.push({price,time:w.updated});w.history=w.history.slice(-100);
+ save();logActivity('Price updated',w.name+' · '+money(price));render();notify('Price history updated.');
+}
+function watchlistHTML(){
+ if(!state.watches.length)return empty('No products tracked yet. Add one above to begin.');
+ return `<div class="list">${state.watches.map(w=>{
+ const hit=w.target>0&&w.current<=w.target,history=w.history||[],first=history[0]?.price??w.current;
+ const change=first?((w.current-first)/first*100):0;
+ const spark=history.slice(-14).map(x=>x.price).join(' · ');
+ return `<div class="list-row"><div style="min-width:0;flex:1"><strong>${safe(w.name)}</strong><p>${safe(w.store||'Retailer not specified')} · ${history.length} recorded price${history.length===1?'':'s'}</p><p>First recorded ${money(first)} · Change ${change.toFixed(1)}%</p><p class="small">History: ${safe(spark)}</p>${w.url?`<a href="${safe(w.url)}" target="_blank" rel="noopener noreferrer">Open product ↗</a>`:''}<p class="small">${safe(w.notes||'')}</p>${hit?'<span class="pill good">AT TARGET PRICE</span>':''}</div><div style="text-align:right;min-width:100px"><strong>${money(w.current)}</strong><p>Target ${w.target?money(w.target):'Not set'}</p><div class="actions" style="justify-content:flex-end"><button class="btn secondary small-btn" onclick="updateWatch(${w.id})">Update</button><button class="btn secondary small-btn" onclick="removeItem('watches',${w.id})">×</button></div></div></div>`;
+ }).join('')}</div>`;
+}
+function vaultPage(){
+ return `<div class="grid">
+ ${card('Create a decision record',`<p>Document the decision, the reasoning behind it and the things you still need to verify.</p><div class="form-grid" style="margin-top:15px">
+ ${field('vTitle','Decision title','e.g. Choosing a new phone')}
+ <div class="field"><label>Decision status</label><select id="vStatus"><option>Researching</option><option>Shortlisted</option><option>Ready to buy</option><option>Purchased</option><option>Decided not to buy</option></select></div>
+ <div class="field full"><label>Summary</label><textarea id="vSummary" rows="3" placeholder="What are you considering? What matters most?"></textarea></div>
+ <div class="field full"><label>Notes and next steps</label><textarea id="vNotes" rows="2" placeholder="Prices to verify, questions for the seller, return policy..."></textarea></div>
+ </div><div class="actions"><button class="btn" onclick="addDecision()">Save decision</button></div>`,'span-12','▤')}
+ ${card('Your saved decisions',vaultHTML(),'span-12','◷')}
+ </div>`;
+}
+function addDecision(){
+ const title=text('vTitle'),summary=text('vSummary'),notes=text('vNotes'),status=text('vStatus');
+ if(!title){notify('Enter a decision title.');return}
+ state.decisions.unshift({id:Date.now(),title,summary,notes,status,time:Date.now()});save();logActivity('Decision saved',title);render();notify('Decision saved.');
+}
+function vaultHTML(){
+ if(!state.decisions.length)return empty('Your decision records and saved analyses will appear here.');
+ return `<div class="list">${state.decisions.map(d=>`<div class="list-row"><div style="flex:1;min-width:0"><strong>${safe(d.title)}</strong><p>${safe(d.status||'Saved analysis')} · ${new Date(d.time).toLocaleString()}</p><p>${safe(d.summary||'')}</p>${d.notes?`<p>Notes: ${safe(d.notes)}</p>`:''}</div><button class="btn secondary small-btn" onclick="removeItem('decisions',${d.id})">Delete</button></div>`).join('')}</div>`;
+}
+function plusPage(){
+ return `<div class="grid">
+ <section class="card span-12 hero"><span class="pill">✦ MEMBERSHIP CONCEPT</span><h1>Better decisions.<br><span style="color:var(--accent)">More considered purchases.</span></h1><p>TRUEPRICE Plus is designed as a premium membership for people who want a more comprehensive buying-intelligence experience.</p><div class="metric">₹49 <span class="small">/ month</span></div><p class="small">Proposed monthly price in INR. Payment and membership activation are not connected.</p><div class="actions"><button class="btn" onclick="notify('Subscription checkout is not connected yet.')">Explore Plus — ₹49/month</button></div></section>
+ ${card('Membership vision',`<div class="list">
+ <div class="list-row"><div><strong>Advanced comparison reports</strong><p>Deeper side-by-side evaluation.</p></div><span class="pill">Planned</span></div>
+ <div class="list-row"><div><strong>Expanded purchase research</strong><p>More structured personal research.</p></div><span class="pill">Planned</span></div>
+ <div class="list-row"><div><strong>Long-term ownership insights</strong><p>More detailed cost projections.</p></div><span class="pill">Planned</span></div>
+ <div class="list-row"><div><strong>Enhanced decision history</strong><p>A more comprehensive buying archive.</p></div><span class="pill">Planned</span></div>
+ </div>`,'span-7','✦')}
+ ${card('Trust comes first',`<h3>No pretend integrations</h3><p>The membership button is a preview. It does not charge money or activate paid benefits.</p><p>Online accounts, cloud sync, retailer integrations and automated notifications require additional backend services.</p><hr><span class="pill">Transparent by design</span>`,'span-5','◇')}
+ </div>`;
+}
+function settingsPage(){
+ return `<div class="grid">
+ ${card('Workspace preferences',`<div class="field"><label>Currency</label><select id="prefCurrency" onchange="setCurrency(this.value)">${[['INR','INR — Indian Rupee'],['USD','USD — US Dollar'],['EUR','EUR — Euro'],['GBP','GBP — British Pound'],['JPY','JPY — Japanese Yen'],['AED','AED — UAE Dirham'],['CAD','CAD — Canadian Dollar'],['AUD','AUD — Australian Dollar']].map(x=>`<option value="${x[0]}" ${state.currency===x[0]?'selected':''}>${x[1]}</option>`).join('')}</select></div><hr><div class="field"><label>Appearance</label><button class="btn secondary" onclick="toggleTheme()">Switch to ${state.theme==='dark'?'light':'dark'} theme</button></div>`,'span-6','⚙')}
+ ${card('Backup and restore',`<p>Keep a portable copy of your saved research. A backup includes your comparisons, decisions, watchlist, preferences and recorded price history.</p><div class="actions"><button class="btn" onclick="exportBackup()">Export JSON</button><button class="btn secondary" onclick="get('importBackup').click()">Restore backup</button><input id="importBackup" class="hidden" type="file" accept=".json,application/json" onchange="importBackup(event)"></div><p class="small">Restoring replaces the current saved workspace. Export a backup first.</p>`,'span-6','⇅')}
+ ${card('Data and privacy',`<p>Information is saved in local browser storage on this device. It is not automatically synced across browsers or devices.</p><p>Clearing site data may erase saved information. Export your backup before changing devices or clearing browser storage.</p><hr><button class="btn danger" onclick="clearWorkspace()">Delete all local data</button>`,'span-12','◇')}
+ </div>`;
+}
+function exportBackup(){
+ const blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'});
+ const url=URL.createObjectURL(blob),a=document.createElement('a');
+ a.href=url;a.download='trueprice-backup-'+new Date().toISOString().slice(0,10)+'.json';
+ document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);notify('Backup export started.');
+}
+function importBackup(event){
+ const file=event.target.files?.[0];if(!file)return;
+ const reader=new FileReader();
+ reader.onload=()=>{
+ try{
+ const d=JSON.parse(reader.result);
+ if(!d||!Array.isArray(d.comparisons)||!Array.isArray(d.watches)||!Array.isArray(d.decisions))throw Error('Invalid backup');
+ if(!confirm('Replace your current TRUEPRICE workspace with this backup?'))return;
+ state={...DEFAULTS,...d};
+ if(!['INR','USD','EUR','GBP','JPY','AED','CAD','AUD'].includes(state.currency))state.currency='INR';
+ for(const k of ['comparisons','watches','decisions','activity'])if(!Array.isArray(state[k]))state[k]=[];
+ save();page='home';render();notify('Backup restored successfully.');
+ }catch(e){notify('That file is not a valid TRUEPRICE backup.')}
+ finally{event.target.value=''}
+ };
+ reader.readAsText(file);
+}
+function clearWorkspace(){
+ if(!confirm('Delete all locally saved TRUEPRICE data? Export a backup first if you need it.'))return;
+ state={...DEFAULTS};save();page='home';render();notify('Workspace cleared.');
+}
+render();
+</script>
+</body>
+</html>
